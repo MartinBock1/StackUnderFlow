@@ -1,0 +1,91 @@
+from django.urls import reverse
+from rest_framework.test import APITestCase, APIClient
+from rest_framework import status
+from rest_framework.authtoken.models import Token
+
+from django.contrib.auth.models import User
+from forum_app.models import Question
+from forum_app.api.serializers import QuestionSerializer
+
+
+class QuestionTests(APITestCase):
+
+    def setUp(self):
+        # Erstellt einen Test-Benutzer
+        self.user = User.objects.create_user(
+            username='testuser',
+            password='testpassword'
+        )
+
+        # Erstellt eine Beispiel-Frage in der Datenbank
+        self.question = Question.objects.create(
+            title='test Question',
+            content='Test Content',
+            author=self.user,
+            category='frontend'
+        )
+
+        # Loggt den Test-Benutzer ein, um Authentifizierung zu ermöglichen
+        # self.client = APIClient()
+        # self.client.login(
+        #     username='testuser',
+        #     password='testpassword'
+        # )
+
+        # Erstellt ein Token für den Test-Benutzer
+        self.token = Token.objects.create(user=self.user)
+        self.client = APIClient()
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+    def test_detail_question(self):
+
+        # Erstellt die URL für den Detail-Endpunkt der spezifischen Frage
+        url = reverse('question-detail', kwargs={'pk': self.question.id})
+
+        # Führt einen GET-Request durch
+        response = self.client.get(url)
+
+        # Holt die erwarteten Daten, wie sie vom Serializer dargestellt werden
+        expected_data = QuestionSerializer(self.question).data
+
+        # Erwartet HTTP 200 als Statuscode
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Erwartet, dass die Antwort exakt dem serialisierten Objekt entspricht
+        self.assertDictEqual(response.data, expected_data)
+
+        # Vergleicht JSON-Inhalte
+        self.assertJSONEqual(response.content, expected_data)
+
+        # Erwartet, dass das Feld "title" in der Antwort vorkommt
+        self.assertContains(response, 'title')
+
+        # Erwartet fälschlicherweise, dass "titles" vorkommt → dieser Test schlägt absichtlich fehl
+        # self.assertContains(response, 'titles')
+
+        # Überprüft, ob genau eine Frage in der Datenbank existiert
+        self.assertEqual(Question.objects.count(), 1)
+        # Überprüft, ob der Autor der Frage der Test-Benutzer ist
+        self.assertEqual(Question.objects.get().author, self.user)
+
+    def test_list_post_question(self):
+        # Erstellt die URL für das Erstellen einer neuen Frage (entspricht dem Endpunkt 'question-list')
+        url = reverse('question-list')
+
+        # Testdaten für eine neue Frage
+        data = {
+            'title': 'Question1',
+            'content': '1Content',
+            'author': self.user.id,
+            'category': 'frontend'
+        }
+
+        # Benutzer ausloggen, um zu testen, ob nicht authentifizierte Nutzer posten dürfen
+        # self.client.logout()  # wirft Statuscode '403 FORBIDDEN' an dieser Stelle
+
+        # Senden eines POST-Requests mit den Testdaten im JSON-Format
+        response = self.client.post(url, data, format='json')
+
+        # Erwartet wird HTTP 201 CREATED als Statuscode (Erfolg beim Erstellen)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
