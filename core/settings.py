@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-*6pg7jy=2xh2+w*ya1m1u5pui7ci&gadzp)j7&y1orfst0!ei!'
+SECRET_KEY = 'django-insecure-*6pg7jy=2xh2+w*ya1m1u5pui7ci&ganz)j7&y1orfst0!ei!'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -146,8 +146,13 @@ REST_FRAMEWORK = {
         'rest_framework.throttling.UserRateThrottle'
     ],
     'DEFAULT_THROTTLE_RATES': {
-        'anon': '100/day',
-        'user': '1000/day',
-        'question': '5/day'
+        'anon': '50/day',
+        'user': '60/day',
+        'question': '5/day',
+        'question-post': '2/day',
+        'question-put': '2/day',
+        'question-patch': '2/day',
+        'question-delete': '2/day',
+        'question-options': '10/day',
     }
 }
