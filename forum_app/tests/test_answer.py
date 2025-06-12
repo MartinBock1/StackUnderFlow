@@ -27,4 +27,13 @@ class AnswerApiTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
 
-    
+    def test_post_answer(self):
+        url = reverse('answer-list-create')
+        data = {
+            'content': 'New Test Answer',
+            'author': self.user.id,
+            'question': self.question.id
+        }
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['question'], self.question.id)
