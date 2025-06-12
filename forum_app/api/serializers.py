@@ -6,7 +6,7 @@ from forum_app.models import Like, Answer, Question
 class AnswerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Answer
-        fields = ['id', 'content', 'author', 'created_at']
+        fields = ['id', 'content', 'author', 'created_at', 'question']
 
 
 class LikeSerializer(serializers.ModelSerializer):

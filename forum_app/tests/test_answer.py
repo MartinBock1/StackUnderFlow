@@ -12,11 +12,11 @@ class AnswerApiTest(APITestCase):
         self.user = User.objects.create_user(username="testuser", password="password")
         self.question = Question.objects.create(
             title="Test Question", content="Test Content", author=self.user)
-        self.client.login(username='testuser', password='password')
+        # self.client.login(username='testuser', password='password')
 
-        # self.token = Token.objects.create(user=self.user)
-        # self.client = APIClient()
-        # self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+        self.token = Token.objects.create(user=self.user)
+        self.client = APIClient()
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
 
         self.answer = Answer.objects.create(
             content="Test Answer", author=self.user, question=self.question)
