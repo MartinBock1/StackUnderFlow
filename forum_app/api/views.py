@@ -45,18 +45,18 @@ class AnswerListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
         
-    # def get_queryset(self):
-    #     queryset = Answer.objects.all()
+    def get_queryset(self):
+        queryset = Answer.objects.all()
         
-    #     content_param = self.request.query_params.get('content', None)
-    #     if content_param is not None:
-    #         queryset = queryset.filter(content__icontains=content_param)
+        content_param = self.request.query_params.get('content', None)
+        if content_param is not None:
+            queryset = queryset.filter(content__icontains=content_param)
             
-    #     username_param = self.request.query_params.get('author', None)
-    #     if username_param is not None:
-    #          queryset = queryset.filter(author__username=username_param)
+        username_param = self.request.query_params.get('author', None)
+        if username_param is not None:
+             queryset = queryset.filter(author__username=username_param)
         
-    #     return queryset
+        return queryset
     
 
 
